@@ -17,6 +17,10 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.FriendlyByteBuf;
 
+import net.mcreator.airraidpewpew.init.AirraidpewpewModTabs;
+import net.mcreator.airraidpewpew.init.AirraidpewpewModItems;
+import net.mcreator.airraidpewpew.init.AirraidpewpewModEntities;
+
 import java.util.function.Supplier;
 import java.util.function.Function;
 import java.util.function.BiConsumer;
@@ -36,6 +40,9 @@ public class AirraidpewpewMod {
 		// End of user code block mod constructor
 		MinecraftForge.EVENT_BUS.register(this);
 		IEventBus bus = context.getModEventBus();
+		AirraidpewpewModItems.REGISTRY.register(bus);
+		AirraidpewpewModEntities.REGISTRY.register(bus);
+		AirraidpewpewModTabs.REGISTRY.register(bus);
 		// Start of user code block mod init
 		// End of user code block mod init
 	}
