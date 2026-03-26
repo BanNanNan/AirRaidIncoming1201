@@ -12,7 +12,7 @@ import net.mcreator.airraidpewpew.client.model.Modelpillagerinterceptor;
 
 public class PillagerInterceptorRenderer extends MobRenderer<PillagerInterceptorEntity, Modelpillagerinterceptor<PillagerInterceptorEntity>> {
 	public PillagerInterceptorRenderer(EntityRendererProvider.Context context) {
-		super(context, new AnimatedModel(context.bakeLayer(Modelpillagerinterceptor.LAYER_LOCATION)), 1f);
+		super(context, new AnimatedModel(context.bakeLayer(Modelpillagerinterceptor.LAYER_LOCATION)), 0.8f);
 	}
 
 	@Override

@@ -73,8 +73,7 @@ public class Modelpillagerinterceptor<T extends Entity> extends EntityModel<T> {
 	}
 
 	public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-		this.head.yRot = netHeadYaw / (180F / (float) Math.PI);
-		this.gun.yRot = netHeadYaw / (180F / (float) Math.PI);
+		this.main.yRot = netHeadYaw / (180F / (float) Math.PI);
 		this.main.xRot = headPitch / (180F / (float) Math.PI);
 	}
 }
