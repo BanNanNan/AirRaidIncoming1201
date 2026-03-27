@@ -176,7 +176,7 @@ public class PillagerInterceptorEntity extends Monster {
 	@Override
 	public void baseTick() {
 		super.baseTick();
-		InterceptorTickingProcedure.execute(this);
+		InterceptorTickingProcedure.execute(this.level(), this.getX(), this.getY(), this.getZ(), this);
 	}
 
 	@Override
