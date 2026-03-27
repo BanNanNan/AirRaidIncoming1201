@@ -24,7 +24,7 @@ public class AirraidpewpewModEntities {
 	public static final RegistryObject<EntityType<PillagerInterceptorEntity>> PILLAGER_INTERCEPTOR = register("pillager_interceptor",
 			EntityType.Builder.<PillagerInterceptorEntity>of(PillagerInterceptorEntity::new, MobCategory.MONSTER).setShouldReceiveVelocityUpdates(true).setTrackingRange(64).setUpdateInterval(3).setCustomClientFactory(PillagerInterceptorEntity::new)
 
-					.sized(0.8f, 1.5f));
+					.sized(0.8f, 1.7f));
 
 	// Start of user code block custom entities
 	// End of user code block custom entities

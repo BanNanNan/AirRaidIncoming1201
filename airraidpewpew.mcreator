@@ -9,8 +9,8 @@
       "metadata": {
         "files": [
           "src/main/resources/assets/airraidpewpew/models/item/pillager_interceptor_spawn_egg.json",
-          "src/main/java/net/mcreator/airraidpewpew/entity/PillagerInterceptorEntity.java",
           "src/main/resources/data/airraidpewpew/forge/biome_modifier/pillager_interceptor_biome_modifier.json",
+          "src/main/java/net/mcreator/airraidpewpew/entity/PillagerInterceptorEntity.java",
           "src/main/java/net/mcreator/airraidpewpew/client/renderer/PillagerInterceptorRenderer.java"
         ]
       },
@@ -53,6 +53,26 @@
         ]
       },
       "path": "~/Interceptor"
+    },
+    {
+      "name": "FollowIfLostTarget",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "follow_if_lost_target",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "return_type": "logic",
+        "files": [
+          "src/main/java/net/mcreator/airraidpewpew/procedures/FollowIfLostTargetProcedure.java"
+        ]
+      },
+      "path": "~/Interceptor"
     }
   ],
   "variable_elements": [
@@ -77,12 +97,12 @@
       "src/main/java/net/mcreator/airraidpewpew/init/AirraidpewpewModItems.java",
       "src/main/java/net/mcreator/airraidpewpew/init/AirraidpewpewModEntityRenderers.java",
       "src/main/java/net/mcreator/airraidpewpew/init/AirraidpewpewModEntities.java",
-      "src/main/resources/META-INF/mods.toml",
+      "src/main/resources/pack.mcmeta",
       "src/main/java/net/mcreator/airraidpewpew/init/AirraidpewpewModTabs.java",
       "src/main/java/net/mcreator/airraidpewpew/network/AirraidpewpewModVariables.java",
       "src/main/java/net/mcreator/airraidpewpew/AirraidpewpewMod.java",
       "src/main/java/net/mcreator/airraidpewpew/init/AirraidpewpewModModels.java",
-      "src/main/resources/pack.mcmeta"
+      "src/main/resources/META-INF/mods.toml"
     ]
   },
   "foldersRoot": {

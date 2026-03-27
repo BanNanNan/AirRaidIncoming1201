@@ -9,22 +9,17 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
-import net.minecraft.world.entity.ai.goal.RangedAttackGoal;
 import net.minecraft.world.entity.ai.goal.RandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
-import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.control.FlyingMoveControl;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -46,7 +41,9 @@ import net.mcreator.airraidpewpew.init.AirraidpewpewModEntities;
 
 import javax.annotation.Nullable;
 
-public class PillagerInterceptorEntity extends Monster implements RangedAttackMob {
+import java.util.EnumSet;
+
+public class PillagerInterceptorEntity extends Monster {
 	public final AnimationState animationState0 = new AnimationState();
 
 	public PillagerInterceptorEntity(PlayMessages.SpawnEntity packet, Level world) {
@@ -58,7 +55,6 @@ public class PillagerInterceptorEntity extends Monster implements RangedAttackMo
 		setMaxUpStep(0.6f);
 		xpReward = 2;
 		setNoAi(false);
-		this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
 		this.moveControl = new FlyingMoveControl(this, 10, true);
 	}
 
@@ -75,17 +71,50 @@ public class PillagerInterceptorEntity extends Monster implements RangedAttackMo
 	@Override
 	protected void registerGoals() {
 		super.registerGoals();
-		this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 2, true) {
+		this.goalSelector.addGoal(1, new Goal() {
+			{
+				this.setFlags(EnumSet.of(Goal.Flag.MOVE));
+			}
+
+			public boolean canUse() {
+				if (PillagerInterceptorEntity.this.getTarget() != null && !PillagerInterceptorEntity.this.getMoveControl().hasWanted()) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+
 			@Override
-			protected double getAttackReachSqr(LivingEntity entity) {
-				return 9;
+			public boolean canContinueToUse() {
+				return PillagerInterceptorEntity.this.getMoveControl().hasWanted() && PillagerInterceptorEntity.this.getTarget() != null && PillagerInterceptorEntity.this.getTarget().isAlive();
+			}
+
+			@Override
+			public void start() {
+				LivingEntity livingentity = PillagerInterceptorEntity.this.getTarget();
+				Vec3 vec3d = livingentity.getEyePosition(1);
+				PillagerInterceptorEntity.this.moveControl.setWantedPosition(vec3d.x, vec3d.y, vec3d.z, 1);
+			}
+
+			@Override
+			public void tick() {
+				LivingEntity livingentity = PillagerInterceptorEntity.this.getTarget();
+				if (PillagerInterceptorEntity.this.getBoundingBox().intersects(livingentity.getBoundingBox())) {
+					PillagerInterceptorEntity.this.doHurtTarget(livingentity);
+				} else {
+					double d0 = PillagerInterceptorEntity.this.distanceToSqr(livingentity);
+					if (d0 < 16) {
+						Vec3 vec3d = livingentity.getEyePosition(1);
+						PillagerInterceptorEntity.this.moveControl.setWantedPosition(vec3d.x, vec3d.y, vec3d.z, 1);
+					}
+				}
 			}
 		});
 		this.targetSelector.addGoal(2, new NearestAttackableTargetGoal(this, Villager.class, true, false));
 		this.targetSelector.addGoal(3, new NearestAttackableTargetGoal(this, Player.class, true, false));
 		this.targetSelector.addGoal(4, new HurtByTargetGoal(this).setAlertOthers());
 		this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
-		this.goalSelector.addGoal(6, new RandomStrollGoal(this, 0.8, 20) {
+		this.goalSelector.addGoal(6, new RandomStrollGoal(this, 0.3, 20) {
 			@Override
 			protected Vec3 getPosition() {
 				RandomSource random = PillagerInterceptorEntity.this.getRandom();
@@ -93,12 +122,6 @@ public class PillagerInterceptorEntity extends Monster implements RangedAttackMo
 				double dir_y = PillagerInterceptorEntity.this.getY() + ((random.nextFloat() * 2 - 1) * 16);
 				double dir_z = PillagerInterceptorEntity.this.getZ() + ((random.nextFloat() * 2 - 1) * 16);
 				return new Vec3(dir_x, dir_y, dir_z);
-			}
-		});
-		this.goalSelector.addGoal(1, new RangedAttackGoal(this, 1.25, 50, 10f) {
-			@Override
-			public boolean canContinueToUse() {
-				return this.canUse();
 			}
 		});
 	}
@@ -157,16 +180,6 @@ public class PillagerInterceptorEntity extends Monster implements RangedAttackMo
 	}
 
 	@Override
-	public void performRangedAttack(LivingEntity target, float flval) {
-		Arrow entityarrow = new Arrow(this.level(), this);
-		double d0 = target.getY() + target.getEyeHeight() - 1.1;
-		double d1 = target.getX() - this.getX();
-		double d3 = target.getZ() - this.getZ();
-		entityarrow.shoot(d1, d0 - entityarrow.getY() + Math.sqrt(d1 * d1 + d3 * d3) * 0.2F, d3, 1.6F, 12.0F);
-		this.level().addFreshEntity(entityarrow);
-	}
-
-	@Override
 	protected void checkFallDamage(double y, boolean onGroundIn, BlockState state, BlockPos pos) {
 	}
 
@@ -187,12 +200,12 @@ public class PillagerInterceptorEntity extends Monster implements RangedAttackMo
 
 	public static AttributeSupplier.Builder createAttributes() {
 		AttributeSupplier.Builder builder = Mob.createMobAttributes();
-		builder = builder.add(Attributes.MOVEMENT_SPEED, 0.3);
-		builder = builder.add(Attributes.MAX_HEALTH, 2);
+		builder = builder.add(Attributes.MOVEMENT_SPEED, 0.2);
+		builder = builder.add(Attributes.MAX_HEALTH, 18);
 		builder = builder.add(Attributes.ARMOR, 0);
 		builder = builder.add(Attributes.ATTACK_DAMAGE, 0);
 		builder = builder.add(Attributes.FOLLOW_RANGE, 32);
-		builder = builder.add(Attributes.FLYING_SPEED, 0.3);
+		builder = builder.add(Attributes.FLYING_SPEED, 0.2);
 		return builder;
 	}
 }
